@@ -26,20 +26,20 @@ We collected all the data and methodology research available from the [Center fo
 
 |File Name|Years|Description|
 |---|---|---|
-|[CH83M.csv](./data/CH83M.csv)|1973-1983|mainland mortality variables|
-|[CH83DG.csv](./data/CH83DG.csv)|1973-1983|mainland diet and geographic variables|
-|[CH83PRU.csv](./data/CH83PRU.csv)|1973-1983|mainland plasma, red blood cell and urine variables|
-|[CH83Q.csv](./data/CH83Q.csv)|1973-1983|mainland questionnaire variables|
-|[CH89M.csv](./data/CH89M.csv)|1986-1989|mainland mortality variables|
-|[CH89DG.csv](./data/CH89DG.csv)|1986-1989|mainland diet and geographic variables|
-|[CH89PRU.csv](./data/CH89PRU.csv)|1986-1989|mainland plasma, red blood cell and urine variables|
-|[CH89Q.csv](./data/CH89Q.csv)|1986-1989|mainland questionnaire variables|
-|[CH93PRU.csv](./data/CH93PRU.csv)|1993|mainland plasma, red blood cell and urine variables|
-|[CH93Q.csv](./data/CH93Q.csv)|1993|mainland questionnaire variables|
-|[CHTAIM.csv](./data/CHTAIM.csv)|1986-1989|Taiwan mortality variables|
-|[CHTAIPRU.csv](./data/CHTAIPRU.csv)|1986-1989|Taiwan plasma, red blood cell and urine variables|
-|[CHTAIQ.csv](./data/CHTAIQ.csv)|1986-1989|Taiwan questionnaire variables|
-|[CHNAME.txt](./data/CHNAME.txt)|-|all the variable codes and their descriptions|
+|[CH83M.csv](./data/original_data/CH83M.csv)|1973-1983|mainland mortality variables|
+|[CH83DG.csv](./data/original_data/CH83DG.csv)|1973-1983|mainland diet and geographic variables|
+|[CH83PRU.csv](./data/original_data/CH83PRU.csv)|1973-1983|mainland plasma, red blood cell and urine variables|
+|[CH83Q.csv](./data/original_data/CH83Q.csv)|1973-1983|mainland questionnaire variables|
+|[CH89M.csv](./data/original_data/CH89M.csv)|1986-1989|mainland mortality variables|
+|[CH89DG.csv](./data/original_data/CH89DG.csv)|1986-1989|mainland diet and geographic variables|
+|[CH89PRU.csv](./data/original_data/CH89PRU.csv)|1986-1989|mainland plasma, red blood cell and urine variables|
+|[CH89Q.csv](./data/original_data/CH89Q.csv)|1986-1989|mainland questionnaire variables|
+|[CH93PRU.csv](./data/original_data/CH93PRU.csv)|1993|mainland plasma, red blood cell and urine variables|
+|[CH93Q.csv](./data/original_data/CH93Q.csv)|1993|mainland questionnaire variables|
+|[CHTAIM.csv](./data/original_data/CHTAIM.csv)|1986-1989|Taiwan mortality variables|
+|[CHTAIPRU.csv](./data/original_data/CHTAIPRU.csv)|1986-1989|Taiwan plasma, red blood cell and urine variables|
+|[CHTAIQ.csv](./data/original_data/CHTAIQ.csv)|1986-1989|Taiwan questionnaire variables|
+|[CHNAME.txt](./data/original_data/CHNAME.txt)|-|all the variable codes and their descriptions|
 
 We decided to focus on the group of datasets from 1986-1989 mainland China for a few reasons.  This iteration included a full set of all four surveys - mortality, diet, blood/urine, and questionnaires.  It also covered additional counties and more individual respondents per county, so the datasets cover a larger sample size.  And finally there were more questions covered in this iteration than in the other ones.
 
@@ -84,17 +84,34 @@ Additionally, each survey was performed slightly differently.  For example, the 
 
 We also renamed the columns in the mortality file with short descriptors so it was easier to know which mortality target we were using without going back and forth to our data dictionary constantly.
 
+Finally we noticed that the counties were all coded alphabetically (`"AA"` through `"YA"`) and the `"NA"` county was read as NaN, so that had to be manually filled back in as a string.
+
 ## Exploratory Data Analysis
-We performed initial EDA by survey 
+We performed initial EDA per each survey.  We created multiple useful bar charts that described interesting details like populations, community distributions of smoking habits, and protein intakes.  We also looked at mortality rates and compared mortality rates between men and women. This work helped us frame the context of the data and gave us the opportunity to explore each of the survey variables and understand them better. 
+
+We also tried here to 'melt' the mortality dataframe which has breakdowns by county and age bracket.  'Melt' allows you to flatten a set of columns into row observations.  We hoped we could use age as it's own feature variable and increase our observation dimensions.  But we realized quickly that since we only had age breakdowns in the mortality dataset, we wouldn't be able to make our targets compatible with the other features from diet/geo, lifestyle questionnaire, and plasma/urine.
 
 ## Modeling
+We proceeded to develop a model that would predict a given mortality rate based on the other features in a combined dataframe.
+
 ### Metrics for Evaluation
+We are dealing with all continuous and numerical data for each of the variables.  We decided that a linear regression model would be the best option for modeling and interpreting our health variables.  To evaluate our models, we used $R^2$ to evaluate how much of the target variance is explained by our predictors and we used $RMSE$ to evaluate the error between $y_{true}$ and $y_{pred}$.  
+
+We calculated a baseline score for the mortality_all_causes target as the mean of those values: $baseline = 14.05 deaths per 1000$.  However, we recognized that this wasn't a very useful metric going forward because we wanted to create a pipeline for each possible feature, so it wouldn't be very helpful to evaluate them against the score for $baseline_{all-causes}$.
 
 ### Pipeline for Target Selection
+For the initial round of modeling, we defined $y$ as one of the mortality columns and $X$ as the rest of the columns.  This scored really high but we realized that this was because our other mortality columns were leaking data into the model.  And we are not looking for comorbidities - we specifically wanted to see how the diet and lifestyle decisions affected different mortality targets.
 
+The next step was to fix the data leakage by selecting one mortality column as $y$ and only columns from CH89DG, CH89PRU, and CH89Q for $X$.  This yielded really poor results, with $R^2$ scores below 0.1 and even negative in some cases.
+
+From here, we went back to the original paper and read through the methodology a bit more.  We realized we needed to separate our data by gender, the way the researchers had done.  This is because there are very different answers for the lifestyle questions for different genders.  We applied a Lasso regularization to the Linear Regression as well and found much better scores.  Not all the targets could be explained well, but the scores improved to where they were mostly all positive (for $R^2$) and scores were closer to 0.5.
+
+We took this final version of our model and created a pipeline so that, for each mortality target in CH89M, we could generate a lasso linear regression, produce the train/test scores, and save them to a results dataframe.
+
+Of note, we tried a few other modeling techniques as well to see if they could yield beneficial results.  We tried both K-Means and DBSCAN as clustering methods to see if we could group the results and use that in our regression, but the result was not helpful.  We also tried PCA to reduce dimensionality since a significant problem was the fact that we had 69 observations and close to 300 features.  While it was a valuable exercise, it did not improve our scores by any measure.  So we went back to our original feature list.
 
 ## Results
-
+We collected the scores from each target in a dataframe, and also collected 
 
 ## Conclusions & Recommendations
 
