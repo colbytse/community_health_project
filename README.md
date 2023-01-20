@@ -26,20 +26,20 @@ We collected all the data and methodology research available from the [Center fo
 
 |File Name|Years|Description|
 |---|---|---|
-|[CH83M.csv](./data/CH83M.csv)|1973-1983|mainland mortality variables|
-|[CH83DG.csv](./data/CH83DG.csv)|1973-1983|mainland diet and geographic variables|
-|[CH83PRU.csv](./data/CH83PRU.csv)|1973-1983|mainland plasma, red blood cell and urine variables|
-|[CH83Q.csv](./data/CH83Q.csv)|1973-1983|mainland questionnaire variables|
-|[CH89M.csv](./data/CH89M.csv)|1986-1989|mainland mortality variables|
-|[CH89DG.csv](./data/CH89DG.csv)|1986-1989|mainland diet and geographic variables|
-|[CH89PRU.csv](./data/CH89PRU.csv)|1986-1989|mainland plasma, red blood cell and urine variables|
-|[CH89Q.csv](./data/CH89Q.csv)|1986-1989|mainland questionnaire variables|
-|[CH93PRU.csv](./data/CH93PRU.csv)|1993|mainland plasma, red blood cell and urine variables|
-|[CH93Q.csv](./data/CH93Q.csv)|1993|mainland questionnaire variables|
-|[CHTAIM.csv](./data/CHTAIM.csv)|1986-1989|Taiwan mortality variables|
-|[CHTAIPRU.csv](./data/CHTAIPRU.csv)|1986-1989|Taiwan plasma, red blood cell and urine variables|
-|[CHTAIQ.csv](./data/CHTAIQ.csv)|1986-1989|Taiwan questionnaire variables|
-|[CHNAME.txt](./data/CHNAME.txt)|-|all the variable codes and their descriptions|
+|[CH83M.csv](./data/original_data/CH83M.csv)|1973-1983|mainland mortality variables|
+|[CH83DG.csv](./data/original_data/CH83DG.csv)|1973-1983|mainland diet and geographic variables|
+|[CH83PRU.csv](./data/original_data/CH83PRU.csv)|1973-1983|mainland plasma, red blood cell and urine variables|
+|[CH83Q.csv](./data/original_data/CH83Q.csv)|1973-1983|mainland questionnaire variables|
+|[CH89M.csv](./data/original_data/CH89M.csv)|1986-1989|mainland mortality variables|
+|[CH89DG.csv](./data/original_data/CH89DG.csv)|1986-1989|mainland diet and geographic variables|
+|[CH89PRU.csv](./data/original_data/CH89PRU.csv)|1986-1989|mainland plasma, red blood cell and urine variables|
+|[CH89Q.csv](./data/original_data/CH89Q.csv)|1986-1989|mainland questionnaire variables|
+|[CH93PRU.csv](./data/original_data/CH93PRU.csv)|1993|mainland plasma, red blood cell and urine variables|
+|[CH93Q.csv](./data/original_data/CH93Q.csv)|1993|mainland questionnaire variables|
+|[CHTAIM.csv](./data/original_data/CHTAIM.csv)|1986-1989|Taiwan mortality variables|
+|[CHTAIPRU.csv](./data/original_data/CHTAIPRU.csv)|1986-1989|Taiwan plasma, red blood cell and urine variables|
+|[CHTAIQ.csv](./data/original_data/CHTAIQ.csv)|1986-1989|Taiwan questionnaire variables|
+|[CHNAME.txt](./data/original_data/CHNAME.txt)|-|all the variable codes and their descriptions|
 
 We decided to focus on the group of datasets from 1986-1989 mainland China for a few reasons.  This iteration included a full set of all four surveys - mortality, diet, blood/urine, and questionnaires.  It also covered additional counties and more individual respondents per county, so the datasets cover a larger sample size.  And finally there were more questions covered in this iteration than in the other ones.
 
@@ -84,8 +84,10 @@ Additionally, each survey was performed slightly differently.  For example, the 
 
 We also renamed the columns in the mortality file with short descriptors so it was easier to know which mortality target we were using without going back and forth to our data dictionary constantly.
 
+Finally we noticed that the counties were all coded alphabetically (`"AA"` through `"YA"`) and the `"NA"` county was read as NaN, so that had to be manually filled back in as a string.
+
 ## Exploratory Data Analysis
-We performed initial EDA by survey 
+We performed initial EDA per each survey.  We created multiple useful bar charts that described interesting details about the populations, community distributions, and protein intakes.  We also looked at mortality rates and compared mortality rates between men and women.
 
 ## Modeling
 ### Metrics for Evaluation
