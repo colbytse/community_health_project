@@ -57,7 +57,7 @@ The downloaded data files came with a readme that contained the below informatio
 > * Total xiang code 3
 > <br>For consistency of format all 9 records are included even where a record consists of all missing values (e.g. mortality values are available only at the county level, so xiang-specific values are all missing)
 
-The CHNAME.txt file was a valuable reference because it contained the description for each question.  Additional details about each survey and the wording of each question can be found in the the resource papers in the [research](./research) folder.
+The CHNAME.txt file was a valuable reference because it contained the description for each question.  Additional details about each survey and the wording of each question can be found in the resource papers in the [research](./research) folder.
 
 An example of the code explanations is below.
 |Code|Keywords|Description|
@@ -80,7 +80,7 @@ An example of the code explanations is below.
 ## Data Cleaning
 The raw data was downloaded as csv's, but we had to go through and clean and process each file so it would be usable in our model.  All the entries were strings with whitespaces, and empty cells were denoted with a `'.'` so we replaced the periods with empty strings, stripped whitespaces, and converted values to floats where possible.  
 
-Additionally, each survey was performed slightly differently.  For example, the mortality surveys have data for `sex==M/F/T` across all counties, but only for `Xiang==3`, the diet surveys have data for `Xiang==1/2/3` but only for `sex==T`, and the questionnaire surveys have different response groups depending on the question (some questions were gender/xiang specific, and some questions may have been asked at different times by different researchers, hence the variance).  Because of this, we dropped rows that were fully null and questions that had a high threshhold null value.
+Additionally, each survey was performed slightly differently.  For example, the mortality surveys have data for `sex==M/F/T` across all counties, but only for `Xiang==3`, the diet surveys have data for `Xiang==1/2/3` but only for `sex==T`, and the questionnaire surveys have different response groups depending on the question (some questions were gender/xiang specific, and some questions may have been asked at different times by different researchers, hence the variance).  Because of this, we dropped rows that were fully null and questions that exceeded our null threshold.
 
 We also renamed the columns in the mortality file with short descriptors so it was easier to know which mortality target we were using without going back and forth to our data dictionary constantly.
 
@@ -111,9 +111,30 @@ We took this final version of our model and created a pipeline so that, for each
 Of note, we tried a few other modeling techniques as well to see if they could yield beneficial results.  We tried both K-Means and DBSCAN as clustering methods to see if we could group the results and use that in our regression, but the result was not helpful.  We also tried PCA to reduce dimensionality since a significant problem was the fact that we had 69 observations and close to 300 features.  While it was a valuable exercise, it did not improve our scores by any measure.  So we went back to our original feature list.
 
 ## Results
-We collected the scores from each target in a dataframe, and also collected 
+We collected the scores from each target in a dataframe, and also collected the features and their coefficients in another.  Using Lasso worked well to reduce the feature space for each target.  Furthermore, because we used a standard linear regression, our coefficients are interpretable - the magnitude of each coefficient tells us how much of an impact that feature has on the prediction.
+
+The feature importance coefficients for both the male and female pipelines were saved to csv's.  We created a `feature_lookup` function that allowed us to input a mortality target and gender and return the top five most important features and their descriptions from CHNAME.txt.
+
+If we look at the two tables below, we see the best performing models in both the male and female pipelines.  After we'd finished most of our work, we realized that the first model in each still contained data leakage because the more important features were values from the questionnaire asking about Schistosomiasis. 
+
+Male Pipeline Scores          |  Female Pipeline Scores
+:-------------------------:|:-------------------------:
+![](assets/male_pipeline_score.png)  |  ![](assets/female_pipeline_score.png)
+
+But if we perform a feature lookup on the second best model in each case, we can see an example of how this tool would work for someone who wants to analyze the factors the contribute to certain mortality causes.  
 
 ## Conclusions & Recommendations
+* We realized that our original goal of a mortality rate predictor was not feasible, for a few reasons.  The data from The China Study is great for analysis and understanding county-level trends, but is not best for a model because of the small observation size.  We also weren't able to find strong enough evidence (in terms of our scores) that would allow us to predict mortality from diet and lifestyle specifications.
 
+* The social value of this project is instead in the analysis and the tool that allows us to look up important features based on a specific target.  Our pipeline makes it easy to use and quickly get information about the most correlated features.  We specifically disagree with the prescriptive method of The China Study which claims that the data fully supports a whole food, plant based diet.  
+
+* Our best evaluation of this dataset is that a provides a great basis for individuals to see a list of possible health factors and make personalized changes as they see fit, according to their lifestyle.
 
 ## Next Steps
+* To improve on this project and make it easier to use, we would like to make our `feature_lookup` tool more robust and design a better interface for it, such as in Streamlit.  However, to do so, we have to create a way to interpret a user's search input, such as 'Lung Cancer for adults' instead of limiting it to 'M035 LUNGCAmc'. 
+
+* Similarly, it would be useful to add a reverse method to the lookup tool as well - users could input a feature such as 'using smoky coal for cooking' which would then look for feature coefficients for the 'Q063' variable and determine which mortalities (if any) it could affect.
+
+* We found that there was still high collinearity and data leakage since we weren't filtering the feature lists.  This would require more work because we'd have to fine tune the feature list for each target, but we would like to develop a way to improve the feature elimination to further reduce dimensionality and overfitting.
+
+* It would help to add data from other survey years to the training model, but it would require either more imputation or completely eliminating more columns that don't have enough values.
