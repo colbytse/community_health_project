@@ -117,11 +117,23 @@ The feature importance coefficients for both the male and female pipelines were 
 
 If we look at the two tables below, we see the best performing models in both the male and female pipelines.  After we'd finished most of our work, we realized that the first model in each still contained data leakage because the more important features were values from the questionnaire asking about Schistosomiasis. 
 
-Male Pipeline Scores          |  Female Pipeline Scores
+<center>
+
+Male Pipeline Scores          | Female Pipeline Scores
 :-------------------------:|:-------------------------:
-![](assets/male_pipeline_score.png)  |  ![](assets/female_pipeline_score.png)
+<img src="assets/male_pipeline_score.png" alt="male pipeline" width="250" height="250"/> |  <img src="assets/female_pipeline_score.png" alt="male pipeline" width="250" height="250"/>
+
+</center>
 
 But if we perform a feature lookup on the second best model in each case, we can see an example of how this tool would work for someone who wants to analyze the factors the contribute to certain mortality causes.  
+
+<center>
+
+`feature_lookup('m012_INFECTc', 'm')`          | `feature_lookup('m029_COLRECCAc', 'f')`  
+:-------------------------:|:-------------------------:
+<img src="assets/male_feature_lookup.png" alt="male pipeline" width="560" height="180"/>  |  <img src="assets/female_feature_lookup.png" alt="male pipeline" width="560" height="180"/> 
+
+</center>
 
 ## Conclusions & Recommendations
 * We realized that our original goal of a mortality rate predictor was not feasible, for a few reasons.  The data from The China Study is great for analysis and understanding county-level trends, but is not best for a model because of the small observation size.  We also weren't able to find strong enough evidence (in terms of our scores) that would allow us to predict mortality from diet and lifestyle specifications.
