@@ -17,13 +17,67 @@
 * Plasma, red blood cell, and urine variables
 * Diet and geography variables
 * Lifestyle questionnaire variables
-We decided to take all these variables and create a model pipeline that would allow us to define a relationship between the various variables and the mortality rates.  Essentially, we want to answer the question "Can we predict mortality rates based on lifestyle and diet variables?"
+
+&emsp;&emsp;We decided to take all these variables and create a model pipeline that would allow us to define a relationship between the various variables and the mortality rates.  Essentially, we want to answer the question "Can we predict mortality rates based on lifestyle and diet variables?"
 
 &emsp;&emsp;The results of our modeling are not intended to be prescriptive - we are not trying to define the healthiest possible diet or lifestyle.  After all, so many of these variables are not within our control.  However, we believe there is value in trying to understand correlations between diet/lifestyle, and chronic disease/mortality.  The goal of this project would be to create a resource that everybody can use to evaluate their own lifestyle and see where feasible adjustments can be made.  
 
 ## Data Information
+We collected all the data and methodology research available from the [Center for Nutrition Studies](https://nutritionstudies.org/the-china-study/).  It contains the following items
 
+|File Name|Years|Description|
+|---|---|---|
+|CH83M.csv|1973-1983|mainland mortality variables|
+|CH83DG.csv|1973-1983|mainland diet and geographic variables|
+|CH83PRU.csv|1973-1983|mainland plasma, red blood cell and urine variables|
+|CH83Q.csv|1973-1983|mainland questionnaire variables|
+|CH89M.csv|1986-1989|mainland mortality variables|
+|CH89DG.csv|1986-1989|mainland diet and geographic variables|
+|CH89PRU.csv|1986-1989|mainland plasma, red blood cell and urine variables|
+|CH89Q.csv|1986-1989|mainland questionnaire variables|
+|CH93PRU.csv|1993|mainland plasma, red blood cell and urine variables|
+|CH93Q.csv|1993|mainland questionnaire variables|
+|CHTAIM.csv|1986-1989|Taiwan mortality variables|
+|CHTAIPRU.csv|1986-1989|Taiwan plasma, red blood cell and urine variables|
+|CHTAIQ.csv|1986-1989|Taiwan questionnaire variables|
+|CHNAME.txt|-|all the variable codes and their descriptions|
 
+We decided to focus on the group of datasets from 1986-1989 mainland China for a few reasons.  This iteration included a full set of all four surveys - mortality, diet, blood/urine, and questionnaires.  It also covered additional counties and more individual respondents per county, so the datasets cover a larger sample size.  And finally there were more questions covered in this iteration than in the other ones.
+
+The downloaded data files came with a readme that contained the below information.  We used this explanation to make decisions about filtering by gender and xiang when appropriate:
+> The first record in each file lists the keywords for variables included in that file.
+> <br>In each file, for each county there are 9 records in total:
+> * Male xiang 1
+> * Male xiang 2
+> * Male xiang code 3 (=mean of xiang 1 and xiang 2 or county value)
+> * Female xiang 1
+> * Female xiang 2
+> * Female xiang code 3
+> * Total xiang 1, where Total (sex code T) =mean of male and female
+> * Total xiang 2
+> * Total xiang code 3
+> <br>For consistency of format all 9 records are included even where a record consists of all missing values (e.g. mortality values are available only at the county level, so xiang-specific values are all missing)
+
+The CHNAME.txt file was a valuable reference because it contained the description for each question.  Additional details about each survey and the wording of each question can be found in the the resource papers in the [research](./research) folder.
+
+An example of the code explanations is below.
+|Code|Keywords|Description|
+|---|---|---|
+|M039| BRAINCAc|   mortality BRAIN TUMOUR (MALIGNANT OR NOT) AGE 35-69 (stand. rate/100,000) (ICD9 191, 225.0, 237.5, 239.6)|
+|M040| LYMPHOMAc|  mortality LYMPHOMA AND MYELOMA AGE 35-69 (stand. rate/100,000) (ICD9 200-3)|
+|M041| LEUKEMIAb|  mortality LEUKAEMIA AGE 0-34 (stand. rate/100,000) (ICD9 204-8)|                                                      
+|...|
+|D007| %ANPRKCAL|  diet survey PERCENTAGE OF CALORIC INTAKE FROM ANIMAL PROTEIN (for reference man)|                                                                                                                           
+|D008| %PLPRKCAL|  diet survey PERCENTAGE OF CALORIC INTAKE FROM PLANT PROTEIN (for reference man)|                                 
+|D009| %CARBKCAL|  diet survey PERCENTAGE OF CALORIC INTAKE FROM CARBOHYDRATE (for reference man)|                                   
+|...|
+|Q065| dWOODNOW|   questionnaire PERCENTAGE USE MAINLY WOOD/STALKS FOR COOKING NOW|                                                  
+|Q066| dOTHFNOW|   questionnaire PERCENTAGE USE MAINLY OTHER FUEL FOR COOKING NOW|                                                   
+|...|
+|Q176| dEGGS|      questionnaire DAYS PER YEAR EAT EGGS|                                                                             
+|Q177| dMILK|      questionnaire DAYS PER YEAR CONSUME MILK OR DAIRY PRODUCTS|                                                       
+|Q178| dJASMIN-T|  questionnaire PERCENT DRINK JASMINE TEA DAILY|                                                                    
+                                                                                                                                             
 ## Data Cleaning
 
 
