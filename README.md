@@ -1,4 +1,4 @@
-# Project 4: Lifestyle and Mortality from The China Study
+# Lifestyle and Mortality from The China Study
 
 ## Executive Summary
 As data scientists, we are constantly looking for ways to better understand the world around us through the lens of data.  How can we make an impact, how can we improve our lives, how can we explain tragedies?  One topic that our group is particularly interested in is health and mortality.  We want to better understand mortality rates and what lifestyle choices impact different causes of death.  There are so many environmental factors that might be bigger indicators, but individual lifestyle decisions regarding diet, habits, location, etc can also be factors.  To look into this question, we turned to The China Study.
